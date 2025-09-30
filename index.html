@@ -1,399 +1,627 @@
 <!doctype html>
 <html lang="it">
+
 <head>
-  <meta charset="utf-8" />
-  <title>LLM per Kubernetes con Minikube – Giovanni Pace x Consoft</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Serie completa: crea un agente AI locale che gestisce Kubernetes con Ollama, Minimal API .NET e Minikube. Contenuto extra del talk #4dev del 3 Ottobre 2025." />
-  <meta name="author" content="Giovanni Pace (Archety.dev)" />
+    <meta charset="utf-8" />
+    <title>LLM per Kubernetes con Minikube – Giovanni Pace x Consoft</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description"
+        content="Serie completa: crea un agente AI locale che gestisce Kubernetes con Ollama, Minimal API .NET e Minikube. Contenuto extra del talk #4dev del 3 Ottobre 2025." />
+    <meta name="author" content="Giovanni Pace (Archety.dev)" />
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="LLM per Kubernetes con Minikube – Archety.dev x Consoft" />
-  <meta property="og:description" content="Un piccolo regalo: 10 video per creare un agente AI locale che parla con Kubernetes. Extra del mio intervento #4dev (3 Ottobre 2025)." />
-  <meta property="og:type" content="website" />
-  <meta property="og:image" content="assets/logo_consoft.png" />
-  <meta property="og:locale" content="it_IT" />
+    <!-- Open Graph -->
+    <meta property="og:title" content="LLM per Kubernetes con Minikube – Archety.dev x Consoft" />
+    <meta property="og:description"
+        content="Un piccolo regalo: 10 video per creare un agente AI locale che parla con Kubernetes. Extra del mio intervento #4dev (3 Ottobre 2025)." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="assets/logo_consoft.png" />
+    <meta property="og:locale" content="it_IT" />
 
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="LLM per Kubernetes con Minikube – Archety.dev x Consoft" />
-  <meta name="twitter:description" content="10 video per costruire un agente AI in locale che gestisce Kubernetes con Ollama e Minikube. Extra #4dev 03/10/2025." />
-  <meta name="twitter:image" content="assets/logo_consoft.png" />
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LLM per Kubernetes con Minikube – Archety.dev x Consoft" />
+    <meta name="twitter:description"
+        content="10 video per costruire un agente AI in locale che gestisce Kubernetes con Ollama e Minikube. Extra #4dev 03/10/2025." />
+    <meta name="twitter:image" content="assets/logo_consoft.png" />
 
-  <style>
-    :root{
-      --bg:#0b0f14;
-      --card:#111826;
-      --muted:#9fb0c3;
-      --text:#eaf2fb;
-      --accent:#df8160; /* Archety vibe */
-      --accent-2:#6ea8fe;
-      --border:#1b2433;
-      --consoft:#00a2e8; /* opzionale se vuoi richiamo colore */
-      --radius:16px;
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
-    }
+    <style>
+        :root {
+            --bg: #0b0f14;
+            --card: #111826;
+            --muted: #9fb0c3;
+            --text: #eaf2fb;
+            --accent: #df8160;
+            /* Archety vibe */
+            --accent-2: #6ea8fe;
+            --border: #1b2433;
+            --consoft: #00a2e8;
+            /* opzionale se vuoi richiamo colore */
+            --radius: 16px;
+            --shadow: 0 10px 30px rgba(0, 0, 0, .35);
+        }
 
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";line-height:1.5}
-    a{color:var(--accent-2);text-decoration:none}
-    a:hover{text-decoration:underline}
-    img{max-width:100%;height:auto;display:block}
+        * {
+            box-sizing: border-box
+        }
 
-    /* Layout */
-    .container{width:min(1200px,92vw);margin-inline:auto}
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+            line-height: 1.5
+        }
 
-    /* Header / Hero */
-    header{
-      position:relative;
-      padding:56px 0 28px;
-      background:linear-gradient(180deg, rgba(223,129,96,.18), rgba(223,129,96,0) 55%);
-      border-bottom:1px solid var(--border);
-    }
-    .brandstrip{
-      display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:18px;
-    }
-    .brandstrip .sep{width:1px;height:28px;background:var(--border)}
-    .badge{
-      display:inline-block;padding:6px 10px;border:1px solid var(--border);
-      background:#0e141f;border-radius:999px;font-size:.9rem;color:var(--muted)
-    }
-    .hero{
-      display:grid;gap:16px
-    }
-    .hero h1{
-      font-size:clamp(1.8rem, 3.6vw, 3rem);margin:4px 0 6px;letter-spacing:.3px
-    }
-    .hero p{
-      color:var(--muted);margin:0;max-width:62ch
-    }
-    .cta{
-      margin-top:14px;display:flex;gap:10px;flex-wrap:wrap
-    }
-    .btn{
-      display:inline-block;padding:12px 16px;border-radius:12px;border:1px solid var(--border);
-      background:var(--card);color:var(--text);text-decoration:none;font-weight:600;
-      box-shadow:var(--shadow);transition:transform .08s ease, background .2s;
-    }
-    .btn:hover{transform:translateY(-2px);background:#0e1623}
-    .btn.primary{background:var(--accent);border-color:transparent}
-    .btn.primary:hover{background:#c96f4f}
-    .logo-consoft{
-      margin-left:auto;display:flex;align-items:center;gap:10px;padding:8px 12px;
-      background:#0e1623;border:1px solid var(--border);border-radius:12px
-    }
-    .logo-consoft img{width:auto;max-height:46px}
+        a {
+            color: var(--accent-2);
+            text-decoration: none
+        }
 
-    /* About */
-    section{
-      padding:32px 0;border-bottom:1px solid var(--border)
-    }
-    .card{
-      background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
-      padding:22px;box-shadow:var(--shadow)
-    }
-    .about{
-      display:grid;grid-template-columns:1.2fr .8fr;gap:22px
-    }
-    @media (max-width: 900px){
-      .about{grid-template-columns:1fr}
-      .logo-consoft{margin-left:0}
-    }
+        a:hover {
+            text-decoration: underline
+        }
 
-    /* Videos grid */
-    .videos .grid{
-      margin-top:18px;
-      display:grid;grid-template-columns:repeat(3,1fr);gap:18px
-    }
-    @media (max-width: 1100px){ .videos .grid{grid-template-columns:repeat(2,1fr)} }
-    @media (max-width: 700px){ .videos .grid{grid-template-columns:1fr} }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block
+        }
 
-    .vcard{
-      border:1px solid var(--border);background:#0e141f;border-radius:14px;padding:16px
-    }
-    .vhead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px}
-    .vnum{
-      font-weight:700;color:#fff;background:linear-gradient(135deg,var(--accent),#ffb38f);
-      padding:6px 10px;border-radius:10px
-    }
-    .vtitle{font-weight:700;margin:0;font-size:1.02rem}
-    .vdesc{color:var(--muted);margin:8px 0 12px}
-    .vactions{display:flex;gap:10px;flex-wrap:wrap}
-    .vactions .btn{padding:10px 12px;border-radius:10px}
+        /* Layout */
+        .container {
+            width: min(1200px, 92vw);
+            margin-inline: auto
+        }
 
-    /* details summary for embed */
-    details{
-      border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#0c121b
-    }
-    details summary{
-      cursor:pointer;list-style:none;padding:12px 14px;font-weight:600;color:#cfe0f5
-    }
-    details[open] summary{border-bottom:1px solid var(--border)}
-    details summary::-webkit-details-marker{display:none}
-    .embed-wrap{aspect-ratio:16/9;background:#000}
-    .embed-wrap iframe{width:100%;height:100%;border:0;display:block}
+        /* Header / Hero */
+        header {
+            position: relative;
+            padding: 56px 0 28px;
+            background: linear-gradient(180deg, rgba(223, 129, 96, .18), rgba(223, 129, 96, 0) 55%);
+            border-bottom: 1px solid var(--border);
+        }
 
-    footer{
-      padding:30px 0;color:var(--muted);font-size:.95rem
-    }
-    .foot-grid{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
-  </style>
+        .brandstrip {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .brandstrip .sep {
+            width: 1px;
+            height: 28px;
+            background: var(--border)
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border: 1px solid var(--border);
+            background: #0e141f;
+            border-radius: 999px;
+            font-size: .9rem;
+            color: var(--muted)
+        }
+
+        .hero {
+            display: grid;
+            gap: 16px
+        }
+
+        .hero h1 {
+            font-size: clamp(1.8rem, 3.6vw, 3rem);
+            margin: 4px 0 6px;
+            letter-spacing: .3px
+        }
+
+        .hero p {
+            color: var(--muted);
+            margin: 0;
+            max-width: 62ch
+        }
+
+        .cta {
+            margin-top: 14px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            transition: transform .08s ease, background .2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            background: #0e1623
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            border-color: transparent
+        }
+
+        .btn.primary:hover {
+            background: #c96f4f
+        }
+
+        .logo-consoft {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: #0e1623;
+            border: 1px solid var(--border);
+            border-radius: 12px
+        }
+
+        .logo-consoft img {
+            width: auto;
+            max-height: 46px
+        }
+
+        /* About */
+        section {
+            padding: 32px 0;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px;
+            box-shadow: var(--shadow)
+        }
+
+        .about {
+            display: grid;
+            grid-template-columns: 1.2fr .8fr;
+            gap: 22px
+        }
+
+        @media (max-width: 900px) {
+            .about {
+                grid-template-columns: 1fr
+            }
+
+            .logo-consoft {
+                margin-left: 0
+            }
+        }
+
+        /* Videos grid */
+        .videos .grid {
+            margin-top: 18px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px
+        }
+
+        @media (max-width: 1100px) {
+            .videos .grid {
+                grid-template-columns: repeat(2, 1fr)
+            }
+        }
+
+        @media (max-width: 700px) {
+            .videos .grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .vcard {
+            border: 1px solid var(--border);
+            background: #0e141f;
+            border-radius: 14px;
+            padding: 16px
+        }
+
+        .vhead {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 8px
+        }
+
+        .vnum {
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(135deg, var(--accent), #ffb38f);
+            padding: 6px 10px;
+            border-radius: 10px
+        }
+
+        .vtitle {
+            font-weight: 700;
+            margin: 0;
+            font-size: 1.02rem
+        }
+
+        .vdesc {
+            color: var(--muted);
+            margin: 8px 0 12px
+        }
+
+        .vactions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap
+        }
+
+        .vactions .btn {
+            padding: 10px 12px;
+            border-radius: 10px
+        }
+
+        /* details summary for embed */
+        details {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            background: #0c121b
+        }
+
+        details summary {
+            cursor: pointer;
+            list-style: none;
+            padding: 12px 14px;
+            font-weight: 600;
+            color: #cfe0f5
+        }
+
+        details[open] summary {
+            border-bottom: 1px solid var(--border)
+        }
+
+        details summary::-webkit-details-marker {
+            display: none
+        }
+
+        .embed-wrap {
+            aspect-ratio: 16/9;
+            background: #000
+        }
+
+        .embed-wrap iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            display: block
+        }
+
+        footer {
+            padding: 30px 0;
+            color: var(--muted);
+            font-size: .95rem
+        }
+
+        .foot-grid {
+            display: flex;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap
+        }
+    </style>
 </head>
+
 <body>
-  <header>
-    <div class="container">
-      <div class="brandstrip">
-        <span class="badge" aria-label="progetto">Giovanni Pace</span>
-        <span class="sep" aria-hidden="true"></span>
-        <span class="badge" aria-label="evento">#4dev · 3 Ottobre 2025</span>
-        <span class="sep" aria-hidden="true"></span>
-        <span class="badge" aria-label="extra">Contenuto extra · LLM per Kubernetes</span>
+    <header>
+        <div class="container">
+            <div class="brandstrip">
+                <span class="badge" aria-label="progetto">Giovanni Pace</span>
+                <span class="sep" aria-hidden="true"></span>
+                <span class="badge" aria-label="evento">#4dev · 3 Ottobre 2025</span>
+                <span class="sep" aria-hidden="true"></span>
+                <span class="badge" aria-label="extra">Contenuto extra · LLM per Kubernetes</span>
 
-        <div class="logo-consoft" aria-label="Consoft">
-          <img src="assets/logo_consoft_bianco.png" alt="Logo Consoft" />
+                <div class="logo-consoft" aria-label="Consoft">
+                    <img src="assets/logo_consoft_bianco.png" alt="Logo Consoft" />
+                </div>
+            </div>
+
+            <div class="hero">
+                <h1>LLM per Kubernetes con Minikube — Crea il tuo Agente Locale</h1>
+                <p>
+                    Questa serie di 10 video completa il mio intervento allo <strong>#4dev del 3 Ottobre 2025</strong>:
+                    un <em>piccolo regalo</em> per costruire un agente AI in locale che traduce il linguaggio naturale
+                    in azioni reali su Kubernetes, grazie a <strong>Ollama</strong>, <strong>Minimal API (.NET)</strong>
+                    e <strong>Minikube</strong>.
+                </p>
+                <div class="cta">
+                    <a class="btn primary" href="#videos">Vai ai video</a>
+                    <a class="btn" href="#chi-sono">Chi sono</a>
+                    <a class="btn" href="https://www.youtube.com/@ArchetyDev" target="_blank" rel="noopener">Canale
+                        YouTube</a>
+                    <a class="btn" href="https://sharp4dev.sharpcoding.it/" target="_blank" rel="noopener">Conferenza
+                        #4Dev</a>
+
+                </div>
+            </div>
         </div>
-      </div>
+    </header>
 
-      <div class="hero">
-        <h1>LLM per Kubernetes con Minikube — Crea il tuo Agente Locale</h1>
-        <p>
-          Questa serie di 10 video completa il mio intervento allo <strong>#4dev del 3 Ottobre 2025</strong>:
-          un <em>piccolo regalo</em> per costruire un agente AI in locale che traduce il linguaggio naturale
-          in azioni reali su Kubernetes, grazie a <strong>Ollama</strong>, <strong>Minimal API (.NET)</strong> e <strong>Minikube</strong>.
-        </p>
-        <div class="cta">
-          <a class="btn primary" href="#videos">Vai ai video</a>
-          <a class="btn" href="#chi-sono">Chi sono</a>
-          <a class="btn" href="https://www.youtube.com/@ArchetyDev" target="_blank" rel="noopener">Canale YouTube</a>
+    <main class="container">
+        <section id="chi-sono" aria-labelledby="chi-sono-title">
+            <div class="about card">
+                <div>
+                    <h2 id="chi-sono-title">Chi sono</h2>
+                    <p>
+                        Ciao! Sono <strong>Giovanni Pace</strong>, ingegnere informatico e docente. Con
+                        <strong>Archety.dev</strong> creo
+                        percorsi tecnici su <em>AI/ML</em>, <em>DevOps</em>, <em>Cloud</em> e <em>Software
+                            Engineering</em>, puntando su
+                        esempi pratici, architetture pulite e strumenti concreti per portare le idee in produzione.
+                    </p>
+                    <p>
+                        In questa serie unisco <strong>Large Language Models</strong> e <strong>Kubernetes</strong> per
+                        mostrarti come
+                        un agente possa semplificare attività complesse: dal creare un <code>Deployment</code>, allo
+                        scalare repliche,
+                        fino a consultare i log — tutto in <em>linguaggio naturale</em>, in locale, senza dipendere dal
+                        cloud.
+                    </p>
+                    <p>
+                        Se ti piace questo progetto, esplora gli altri contenuti sul <a
+                            href="https://www.youtube.com/@ArchetyDev" target="_blank" rel="noopener">Canale
+                            YouTube</a>. Grazie a <strong>Consoft</strong> per la collaborazione e il supporto.
+                    </p>
+                </div>
+                <div class="card" style="background:#0c121b">
+                    <h3 style="margin-top:0">Cosa impari in questa serie</h3>
+                    <ul>
+                        <li>Installare <strong>Ollama</strong> e <strong>Minikube</strong> per un ambiente AI + K8s
+                            totalmente locale</li>
+                        <li>Creare una <strong>Minimal API .NET</strong> per orchestrare il flusso</li>
+                        <li>Scrivere prompt efficaci (incluso <strong>JSON Prompting</strong>) e deserializzare in C#
+                        </li>
+                        <li>Usare l’LLM per <strong>creare</strong> e <strong>scalare</strong> Deployment, leggere Pod e
+                            <strong>recuperare log</strong></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="videos" class="videos" aria-labelledby="videos-title">
+            <h2 id="videos-title">I 10 video – LLM per Kubernetes</h2>
+            <div class="grid">
+
+                <!-- 01 -->
+                <article class="vcard" aria-labelledby="v1-title">
+                    <div class="vhead">
+                        <span class="vnum">01</span>
+                        <h3 class="vtitle" id="v1-title">Prerequisiti, Ollama e Minikube</h3>
+                    </div>
+                    <p class="vdesc">Prepariamo l'ambiente locale: installiamo Ollama e Kubernetes Minikube e vediamo i
+                        prerequisiti per l’agente.</p>
+                    <div class="vactions">
+                        <a class="btn" href="https://www.youtube.com/watch?v=3i7_NwDbswk" target="_blank"
+                            rel="noopener">Guarda su YouTube</a>
+                    </div>
+                    <details>
+                        <summary>Mostra player incorporato</summary>
+                        <div class="embed-wrap">
+                            <iframe title="Video 01" src="https://www.youtube.com/embed/3i7_NwDbswk" allowfullscreen
+                                loading="lazy"></iframe>
+                        </div>
+                    </details>
+                </article>
+
+                <!-- 02 -->
+                <article class="vcard" aria-labelledby="v2-title">
+                    <div class="vhead">
+                        <span class="vnum">02</span>
+                        <h3 class="vtitle" id="v2-title">Minimal API .NET e dipendenze</h3>
+                    </div>
+                    <p class="vdesc">Creiamo la Minimal API e configuriamo le dipendenze per far dialogare l’agente con
+                        LLM e Kubernetes.</p>
+                    <div class="vactions">
+                        <a class="btn" href="https://www.youtube.com/watch?v=idM5RsDrh6M" target="_blank"
+                            rel="noopener">Guarda su YouTube</a>
+                    </div>
+                    <details>
+                        <summary>Mostra player incorporato</summary>
+                        <div class="embed-wrap">
+                            <iframe title="Video 02" src="https://www.youtube.com/embed/idM5RsDrh6M" allowfullscreen
+                                loading="lazy"></iframe>
+                        </div>
+                    </details>
+                </article>
+
+                <!-- 03 -->
+                <article class="vcard" aria-labelledby="v3-title">
+                    <div class="vhead">
+                        <span class="vnum">03</span>
+                        <h3 class="vtitle" id="v3-title">Service Ollama & primi prompt (Pt.1)</h3>
+                    </div>
+                    <p class="vdesc">Registriamo il service di Ollama e scriviamo i primi prompt che generano istruzioni
+                        per il cluster.</p>
+                    <div class="vactions">
+                        <a class="btn" href="https://www.youtube.com/watch?v=DFB-ZZJNNc8" target="_blank"
+                            rel="noopener">Guarda su YouTube</a>
+                    </div>
+                    <details>
+                        <summary>Mostra player incorporato</summary>
+                        <div class="embed-wrap">
+                            <iframe title="Video 03" src="https://www.youtube.com/embed/DFB-ZZJNNc8" allowfullscreen
+                                loading="lazy"></iframe>
+                        </div>
+                    </details>
+                </article>
+
+                <!-- 04 -->
+                <article class="vcard" aria-labelledby="v4-title">
+                    <div class="vhead">
+                        <span class="vnum">04</span>
+                        <h3 class="vtitle" id="v4-title">Service Ollama & prompt avanzati (Pt.2)</h3>
+                    </div>
+                    <p class="vdesc">Affiniamo i prompt e completiamo l’integrazione per un dialogo robusto con
+                        Kubernetes.</p>
+                    <div class="vactions">
+                        <a class="btn" href="https://www.youtube.com/watch?v=BVnxT5HlMMM" target="_blank"
+                            rel="noopener">Guarda su YouTube</a>
+                    </div>
+                    <details>
+                        <summary>Mostra player incorporato</summary>
+                        <div class="embed-wrap">
+                            <iframe title="Video 04" src="https://www.youtube.com/embed/BVnxT5HlMMM" allowfullscreen
+                                loading="lazy"></iframe>
+                        </div>
+                    </details>
+                </article>
+
+                <!-- 05 -->
+                <article class="vcard" aria-labelledby="v5-title">
+                    <div class="vhead">
+                        <span class="vnum">05</span>
+                        <h3 class="vtitle" id="v5-title">Chiamata a Ollama & istruzioni per K8s</h3>
+                    </div>
+                    <p class="vdesc">Prima chiamata reale all’LLM per ottenere comandi concreti eseguibili sul cluster.
+                    </p>
+                    <div class="vactions">
+                        <a class="btn" href="https://www.youtube.com/watch?v=VQNuUcPl4FU" target="_blank"
+                            rel="noopener">Guarda su YouTube</a>
+                    </div>
+                    <details>
+                        <summary>Mostra player incorporato</summary>
+                        <div class="embed-wrap">
+                            <iframe title="Video 05" src="https://www.youtube.com/embed/VQNuUcPl4FU" allowfullscreen
+                                loading="lazy"></iframe>
+                        </div>
+                    </details>
+                </article>
+
+                <!-- 06 -->
+                <article class="vcard" aria-labelledby="v6-title">
+                    <div class="vhead">
+                        <span class="vnum">06</span>
+                        <h3 class="vtitle" id="v6-title">JSON Prompting & deserializzazione</h3>
+                    </div>
+                    <p class="vdesc">Strutturiamo le risposte del modello in JSON e le convertiamo in oggetti C# pronti
+                        all’uso.</p>
+                    <div class="vactions">
+                        <a class="btn" href="https://www.youtube.com/watch?v=K-Mtbn48zNk" target="_blank"
+                            rel="noopener">Guarda su YouTube</a>
+                    </div>
+                    <details>
+                        <summary>Mostra player incorporato</summary>
+                        <div class="embed-wrap">
+                            <iframe title="Video 06" src="https://www.youtube.com/embed/K-Mtbn48zNk" allowfullscreen
+                                loading="lazy"></iframe>
+                        </div>
+                    </details>
+                </article>
+
+                <!-- 07 -->
+                <article class="vcard" aria-labelledby="v7-title">
+                    <div class="vhead">
+                        <span class="vnum">07</span>
+                        <h3 class="vtitle" id="v7-title">Servizio Kubernetes in Dependency Injection</h3>
+                    </div>
+                    <p class="vdesc">Registriamo il servizio K8s nel DI Container per un’orchestrazione modulare e
+                        scalabile.</p>
+                    <div class="vactions">
+                        <a class="btn" href="https://www.youtube.com/watch?v=iOKD09gJ6qk" target="_blank"
+                            rel="noopener">Guarda su YouTube</a>
+                    </div>
+                    <details>
+                        <summary>Mostra player incorporato</summary>
+                        <div class="embed-wrap">
+                            <iframe title="Video 07" src="https://www.youtube.com/embed/iOKD09gJ6qk" allowfullscreen
+                                loading="lazy"></iframe>
+                        </div>
+                    </details>
+                </article>
+
+                <!-- 08 -->
+                <article class="vcard" aria-labelledby="v8-title">
+                    <div class="vhead">
+                        <span class="vnum">08</span>
+                        <h3 class="vtitle" id="v8-title">Creare un Deployment & leggere i Pod</h3>
+                    </div>
+                    <p class="vdesc">Creiamo un Deployment su Minikube e recuperiamo la lista dei Pod attivi generando i
+                        comandi via LLM.</p>
+                    <div class="vactions">
+                        <a class="btn" href="https://www.youtube.com/watch?v=Fi4bGSgR33s" target="_blank"
+                            rel="noopener">Guarda su YouTube</a>
+                    </div>
+                    <details>
+                        <summary>Mostra player incorporato</summary>
+                        <div class="embed-wrap">
+                            <iframe title="Video 08" src="https://www.youtube.com/embed/Fi4bGSgR33s" allowfullscreen
+                                loading="lazy"></iframe>
+                        </div>
+                    </details>
+                </article>
+
+                <!-- 09 -->
+                <article class="vcard" aria-labelledby="v9-title">
+                    <div class="vhead">
+                        <span class="vnum">09</span>
+                        <h3 class="vtitle" id="v9-title">Scalare un Deployment in linguaggio naturale</h3>
+                    </div>
+                    <p class="vdesc">Da “porta a 5 repliche” a stato aggiornato del cluster: lo scaling controllato
+                        dall’agente AI.</p>
+                    <div class="vactions">
+                        <a class="btn" href="https://www.youtube.com/watch?v=XFOzRTET-2w" target="_blank"
+                            rel="noopener">Guarda su YouTube</a>
+                    </div>
+                    <details>
+                        <summary>Mostra player incorporato</summary>
+                        <div class="embed-wrap">
+                            <iframe title="Video 09" src="https://www.youtube.com/embed/XFOzRTET-2w" allowfullscreen
+                                loading="lazy"></iframe>
+                        </div>
+                    </details>
+                </article>
+
+                <!-- 10 -->
+                <article class="vcard" aria-labelledby="v10-title">
+                    <div class="vhead">
+                        <span class="vnum">10</span>
+                        <h3 class="vtitle" id="v10-title">Recuperare i log di un Pod selezionato</h3>
+                    </div>
+                    <p class="vdesc">Formuliamo il prompt e otteniamo i log del Pod interessato direttamente su
+                        Minikube.</p>
+                    <div class="vactions">
+                        <a class="btn" href="https://www.youtube.com/watch?v=fx4m1XfIHdU" target="_blank"
+                            rel="noopener">Guarda su YouTube</a>
+                    </div>
+                    <details>
+                        <summary>Mostra player incorporato</summary>
+                        <div class="embed-wrap">
+                            <iframe title="Video 10" src="https://www.youtube.com/embed/fx4m1XfIHdU" allowfullscreen
+                                loading="lazy"></iframe>
+                        </div>
+                    </details>
+                </article>
+
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container foot-grid">
+            <div>© <span id="year">2025</span> Giovanni Pace · Archety.dev</div>
+            <div>Extra del talk <strong>#4dev – 3 Ottobre 2025</strong> · Con la collaborazione di
+                <strong>Consoft</strong></div>
         </div>
-      </div>
-    </div>
-  </header>
-
-  <main class="container">
-    <section id="chi-sono" aria-labelledby="chi-sono-title">
-      <div class="about card">
-        <div>
-          <h2 id="chi-sono-title">Chi sono</h2>
-          <p>
-            Ciao! Sono <strong>Giovanni Pace</strong>, ingegnere informatico e docente. Con <strong>Archety.dev</strong> creo
-            percorsi tecnici su <em>AI/ML</em>, <em>DevOps</em>, <em>Cloud</em> e <em>Software Engineering</em>, puntando su
-            esempi pratici, architetture pulite e strumenti concreti per portare le idee in produzione.
-          </p>
-          <p>
-            In questa serie unisco <strong>Large Language Models</strong> e <strong>Kubernetes</strong> per mostrarti come
-            un agente possa semplificare attività complesse: dal creare un <code>Deployment</code>, allo scalare repliche,
-            fino a consultare i log — tutto in <em>linguaggio naturale</em>, in locale, senza dipendere dal cloud.
-          </p>
-          <p>
-            Se ti piace questo progetto, esplora gli altri contenuti sul <a href="https://www.youtube.com/@ArchetyDev" target="_blank" rel="noopener">Canale YouTube</a>. Grazie a <strong>Consoft</strong> per la collaborazione e il supporto.
-          </p>
-        </div>
-        <div class="card" style="background:#0c121b">
-          <h3 style="margin-top:0">Cosa impari in questa serie</h3>
-          <ul>
-            <li>Installare <strong>Ollama</strong> e <strong>Minikube</strong> per un ambiente AI + K8s totalmente locale</li>
-            <li>Creare una <strong>Minimal API .NET</strong> per orchestrare il flusso</li>
-            <li>Scrivere prompt efficaci (incluso <strong>JSON Prompting</strong>) e deserializzare in C#</li>
-            <li>Usare l’LLM per <strong>creare</strong> e <strong>scalare</strong> Deployment, leggere Pod e <strong>recuperare log</strong></li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <section id="videos" class="videos" aria-labelledby="videos-title">
-      <h2 id="videos-title">I 10 video – LLM per Kubernetes</h2>
-      <div class="grid">
-
-        <!-- 01 -->
-        <article class="vcard" aria-labelledby="v1-title">
-          <div class="vhead">
-            <span class="vnum">01</span>
-            <h3 class="vtitle" id="v1-title">Prerequisiti, Ollama e Minikube</h3>
-          </div>
-          <p class="vdesc">Prepariamo l'ambiente locale: installiamo Ollama e Kubernetes Minikube e vediamo i prerequisiti per l’agente.</p>
-          <div class="vactions">
-            <a class="btn" href="https://www.youtube.com/watch?v=3i7_NwDbswk" target="_blank" rel="noopener">Guarda su YouTube</a>
-          </div>
-          <details>
-            <summary>Mostra player incorporato</summary>
-            <div class="embed-wrap">
-              <iframe title="Video 01" src="https://www.youtube.com/embed/3i7_NwDbswk" allowfullscreen loading="lazy"></iframe>
-            </div>
-          </details>
-        </article>
-
-        <!-- 02 -->
-        <article class="vcard" aria-labelledby="v2-title">
-          <div class="vhead">
-            <span class="vnum">02</span>
-            <h3 class="vtitle" id="v2-title">Minimal API .NET e dipendenze</h3>
-          </div>
-          <p class="vdesc">Creiamo la Minimal API e configuriamo le dipendenze per far dialogare l’agente con LLM e Kubernetes.</p>
-          <div class="vactions">
-            <a class="btn" href="https://www.youtube.com/watch?v=idM5RsDrh6M" target="_blank" rel="noopener">Guarda su YouTube</a>
-          </div>
-          <details>
-            <summary>Mostra player incorporato</summary>
-            <div class="embed-wrap">
-              <iframe title="Video 02" src="https://www.youtube.com/embed/idM5RsDrh6M" allowfullscreen loading="lazy"></iframe>
-            </div>
-          </details>
-        </article>
-
-        <!-- 03 -->
-        <article class="vcard" aria-labelledby="v3-title">
-          <div class="vhead">
-            <span class="vnum">03</span>
-            <h3 class="vtitle" id="v3-title">Service Ollama & primi prompt (Pt.1)</h3>
-          </div>
-          <p class="vdesc">Registriamo il service di Ollama e scriviamo i primi prompt che generano istruzioni per il cluster.</p>
-          <div class="vactions">
-            <a class="btn" href="https://www.youtube.com/watch?v=DFB-ZZJNNc8" target="_blank" rel="noopener">Guarda su YouTube</a>
-          </div>
-          <details>
-            <summary>Mostra player incorporato</summary>
-            <div class="embed-wrap">
-              <iframe title="Video 03" src="https://www.youtube.com/embed/DFB-ZZJNNc8" allowfullscreen loading="lazy"></iframe>
-            </div>
-          </details>
-        </article>
-
-        <!-- 04 -->
-        <article class="vcard" aria-labelledby="v4-title">
-          <div class="vhead">
-            <span class="vnum">04</span>
-            <h3 class="vtitle" id="v4-title">Service Ollama & prompt avanzati (Pt.2)</h3>
-          </div>
-          <p class="vdesc">Affiniamo i prompt e completiamo l’integrazione per un dialogo robusto con Kubernetes.</p>
-          <div class="vactions">
-            <a class="btn" href="https://www.youtube.com/watch?v=BVnxT5HlMMM" target="_blank" rel="noopener">Guarda su YouTube</a>
-          </div>
-          <details>
-            <summary>Mostra player incorporato</summary>
-            <div class="embed-wrap">
-              <iframe title="Video 04" src="https://www.youtube.com/embed/BVnxT5HlMMM" allowfullscreen loading="lazy"></iframe>
-            </div>
-          </details>
-        </article>
-
-        <!-- 05 -->
-        <article class="vcard" aria-labelledby="v5-title">
-          <div class="vhead">
-            <span class="vnum">05</span>
-            <h3 class="vtitle" id="v5-title">Chiamata a Ollama & istruzioni per K8s</h3>
-          </div>
-          <p class="vdesc">Prima chiamata reale all’LLM per ottenere comandi concreti eseguibili sul cluster.</p>
-          <div class="vactions">
-            <a class="btn" href="https://www.youtube.com/watch?v=VQNuUcPl4FU" target="_blank" rel="noopener">Guarda su YouTube</a>
-          </div>
-          <details>
-            <summary>Mostra player incorporato</summary>
-            <div class="embed-wrap">
-              <iframe title="Video 05" src="https://www.youtube.com/embed/VQNuUcPl4FU" allowfullscreen loading="lazy"></iframe>
-            </div>
-          </details>
-        </article>
-
-        <!-- 06 -->
-        <article class="vcard" aria-labelledby="v6-title">
-          <div class="vhead">
-            <span class="vnum">06</span>
-            <h3 class="vtitle" id="v6-title">JSON Prompting & deserializzazione</h3>
-          </div>
-          <p class="vdesc">Strutturiamo le risposte del modello in JSON e le convertiamo in oggetti C# pronti all’uso.</p>
-          <div class="vactions">
-            <a class="btn" href="https://www.youtube.com/watch?v=K-Mtbn48zNk" target="_blank" rel="noopener">Guarda su YouTube</a>
-          </div>
-          <details>
-            <summary>Mostra player incorporato</summary>
-            <div class="embed-wrap">
-              <iframe title="Video 06" src="https://www.youtube.com/embed/K-Mtbn48zNk" allowfullscreen loading="lazy"></iframe>
-            </div>
-          </details>
-        </article>
-
-        <!-- 07 -->
-        <article class="vcard" aria-labelledby="v7-title">
-          <div class="vhead">
-            <span class="vnum">07</span>
-            <h3 class="vtitle" id="v7-title">Servizio Kubernetes in Dependency Injection</h3>
-          </div>
-          <p class="vdesc">Registriamo il servizio K8s nel DI Container per un’orchestrazione modulare e scalabile.</p>
-          <div class="vactions">
-            <a class="btn" href="https://www.youtube.com/watch?v=iOKD09gJ6qk" target="_blank" rel="noopener">Guarda su YouTube</a>
-          </div>
-          <details>
-            <summary>Mostra player incorporato</summary>
-            <div class="embed-wrap">
-              <iframe title="Video 07" src="https://www.youtube.com/embed/iOKD09gJ6qk" allowfullscreen loading="lazy"></iframe>
-            </div>
-          </details>
-        </article>
-
-        <!-- 08 -->
-        <article class="vcard" aria-labelledby="v8-title">
-          <div class="vhead">
-            <span class="vnum">08</span>
-            <h3 class="vtitle" id="v8-title">Creare un Deployment & leggere i Pod</h3>
-          </div>
-          <p class="vdesc">Creiamo un Deployment su Minikube e recuperiamo la lista dei Pod attivi generando i comandi via LLM.</p>
-          <div class="vactions">
-            <a class="btn" href="https://www.youtube.com/watch?v=Fi4bGSgR33s" target="_blank" rel="noopener">Guarda su YouTube</a>
-          </div>
-          <details>
-            <summary>Mostra player incorporato</summary>
-            <div class="embed-wrap">
-              <iframe title="Video 08" src="https://www.youtube.com/embed/Fi4bGSgR33s" allowfullscreen loading="lazy"></iframe>
-            </div>
-          </details>
-        </article>
-
-        <!-- 09 -->
-        <article class="vcard" aria-labelledby="v9-title">
-          <div class="vhead">
-            <span class="vnum">09</span>
-            <h3 class="vtitle" id="v9-title">Scalare un Deployment in linguaggio naturale</h3>
-          </div>
-          <p class="vdesc">Da “porta a 5 repliche” a stato aggiornato del cluster: lo scaling controllato dall’agente AI.</p>
-          <div class="vactions">
-            <a class="btn" href="https://www.youtube.com/watch?v=XFOzRTET-2w" target="_blank" rel="noopener">Guarda su YouTube</a>
-          </div>
-          <details>
-            <summary>Mostra player incorporato</summary>
-            <div class="embed-wrap">
-              <iframe title="Video 09" src="https://www.youtube.com/embed/XFOzRTET-2w" allowfullscreen loading="lazy"></iframe>
-            </div>
-          </details>
-        </article>
-
-        <!-- 10 -->
-        <article class="vcard" aria-labelledby="v10-title">
-          <div class="vhead">
-            <span class="vnum">10</span>
-            <h3 class="vtitle" id="v10-title">Recuperare i log di un Pod selezionato</h3>
-          </div>
-          <p class="vdesc">Formuliamo il prompt e otteniamo i log del Pod interessato direttamente su Minikube.</p>
-          <div class="vactions">
-            <a class="btn" href="https://www.youtube.com/watch?v=fx4m1XfIHdU" target="_blank" rel="noopener">Guarda su YouTube</a>
-          </div>
-          <details>
-            <summary>Mostra player incorporato</summary>
-            <div class="embed-wrap">
-              <iframe title="Video 10" src="https://www.youtube.com/embed/fx4m1XfIHdU" allowfullscreen loading="lazy"></iframe>
-            </div>
-          </details>
-        </article>
-
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="container foot-grid">
-      <div>© <span id="year">2025</span> Giovanni Pace · Archety.dev</div>
-      <div>Extra del talk <strong>#4dev – 3 Ottobre 2025</strong> · Con la collaborazione di <strong>Consoft</strong></div>
-    </div>
-  </footer>
+    </footer>
 </body>
+
 </html>
