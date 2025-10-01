@@ -1,0 +1,6 @@
+@Minimal_Agent_RAG_HostAddress = http://localhost:5217
+
+GET {{Minimal_Agent_RAG_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
